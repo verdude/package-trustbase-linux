@@ -4,7 +4,7 @@ scriptpath="$(cd "$(dirname "$0")"; pwd -P)"
 cd "$scriptpath"
 
 if [ -n "$(which dnf)" ]; then
-    sudo dnf install fedora-packager fedora-review git
+    sudo dnf install fedora-packager fedora-review git gcc
     sudo dnf install openssl-devel libconfig-devel libnl3-devel libsqlite3x-devel libcap-devel python-devel libevent-devel pyOpenSSL
     sudo dnf install kernel-devel-$(uname -r) kernel-headers-$(uname -r)
 else
@@ -27,7 +27,7 @@ if [ "$in_mock_group" -ne 0 ]; then
     fi
 fi
 
-git clone https://github.com/verdude/trustbase-linux
+git clone https://github.com/markoneill/trustbase-linux
 # change the build target to a local directory
 sed -i.bak 's/^PREFIX = \S*$/PREFIX = build/g' trustbase-linux/Makefile
 tar cf trustbase-linux-1.0.0.tar.gz trustbase-linux

@@ -1,8 +1,8 @@
 %define version       1.0.0
 %define name          trustbase-linux
-%define kmod          trustbase_linux
+%define kmod_name     trustbase_linux
 %define install_dir   %{_libdir}/%{name}
-%define module_dir    /lib/modules/%(uname -r)/kernel/net/%{name}
+%define module_dir    /lib/modules/%(uname -r)/kernel/extra/%{name}
 %define debug_package %{nil}
 
 Name: %{name}
@@ -28,7 +28,7 @@ BuildRequires: kernel-devel >= 4.5
 BuildRequires: kernel-headers >= 4.5
 
 %description
-TLS certificate validation.
+LKM for TLS certificate validation.
 
 %prep
 %autosetup -n %{name}
@@ -44,19 +44,19 @@ make install
 mkdir -p %{buildroot}%{install_dir}
 cp -r build/* %{buildroot}%{install_dir}
 mkdir -p %{buildroot}/etc/modules-load.d/
-echo %{install_dir}/%{kmod}.ko \\> %{buildroot}/etc/modules-load.d/%{name}.conf
+echo %{install_dir}/%{kmod_name}.ko \\> %{buildroot}/etc/modules-load.d/%{name}.conf
 
 %post
 # Create directory in which to store the kernel module
 # insmod does not detect symlinked files
 # insmod won't load the module if it is not in /lib/modules/%(uname -r)/
 mkdir -p %{module_dir}
-cp %{install_dir}/%{kmod}.ko %{module_dir}/%{kmod}.ko
-insmod %{module_dir}/%{kmod}.ko tb_path=%{install_dir}
+cp %{install_dir}/%{kmod_name}.ko %{module_dir}/%{kmod_name}.ko
+insmod %{module_dir}/%{kmod_name}.ko tb_path=%{install_dir}
 
 %postun
-rmmod %{module_dir}/%{kmod}.ko
-rm %{module_dir}/%{kmod}.ko
+rmmod %{module_dir}/%{kmod_name}.ko
+rm %{module_dir}/%{kmod_name}.ko
 rmdir %{module_dir}
 
 %files
