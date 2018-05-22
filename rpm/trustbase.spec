@@ -1,9 +1,10 @@
-%define version       1.0.0
-%define name          trustbase-linux
-%define kmod_name     trustbase_linux
-%define install_dir   %{_libdir}/%{name}
-%define module_dir    /lib/modules/%(uname -r)/kernel/extra/%{name}
-%define debug_package %{nil}
+%define version          1.0.0
+%define name             trustbase-linux
+%define kmod_name        trustbase_linux
+%define trustbase_config trustbase.cfg
+%define install_dir      %{_libdir}/%{name}
+%define module_dir       /lib/modules/%(uname -r)/kernel/extra/%{name}
+%define debug_package    %{nil}
 
 Name: %{name}
 Version: %{version}
@@ -43,26 +44,28 @@ make
 make install
 mkdir -p %{buildroot}%{install_dir}
 cp -r build/* %{buildroot}%{install_dir}
-mkdir -p %{buildroot}/etc/modules-load.d/
-echo %{install_dir}/%{kmod_name}.ko \\> %{buildroot}/etc/modules-load.d/%{name}.conf
+mkdir -p %{buildroot}%{_sysconfdir}/modules-load.d/
+echo %{install_dir}/%{kmod_name}.ko tb_path="%{install_dir}"> %{buildroot}%{_sysconfdir}/modules-load.d/%{name}.conf
 
 %post
+ln -sf %{install_dir}/policy-engine/%{trustbase_config} %{_sysconfdir}/%{trustbase_config}
 # Create directory in which to store the kernel module
 # insmod does not detect symlinked files
 # insmod won't load the module if it is not in /lib/modules/%(uname -r)/
 mkdir -p %{module_dir}
 cp %{install_dir}/%{kmod_name}.ko %{module_dir}/%{kmod_name}.ko
-insmod %{module_dir}/%{kmod_name}.ko tb_path=%{install_dir}
+insmod %{module_dir}/%{kmod_name}.ko tb_path="%{install_dir}"
 
 %postun
 rmmod %{module_dir}/%{kmod_name}.ko
 rm %{module_dir}/%{kmod_name}.ko
 rmdir %{module_dir}
+rm -f %{_sysconfdir}/%{trustbase_config}
 
 %files
 %defattr(644,root,root,755)
 %{install_dir}/
-/etc/modules-load.d/%{name}.conf
+%{_sysconfdir}/modules-load.d/%{name}.conf
 
 %changelog
 * Mon May 14 2018 Santiago Verdu santiagoverdu@protonmail.com 1.0.0-1
