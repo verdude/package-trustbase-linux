@@ -1,9 +1,9 @@
 %define version          1.0.0
-%define name             trustbase-linux
+%define kmod_package     trustbase-linux
+%define name             %{kmod_package}-config
 %define kmod_name        trustbase_linux
 %define trustbase_config trustbase.cfg
 %define install_dir      %{_libdir}/%{name}
-%define module_dir       /lib/modules/%(uname -r)/kernel/extra/%{name}
 %define debug_package    %{nil}
 
 Name: %{name}
@@ -11,10 +11,10 @@ Version: %{version}
 Release: 1
 License: Public Domain
 Group: Security
-Summary: An OS service to repair and strengthen TLS certificate validation
+Summary: Trustbase Policy Engine and Configuration
 URL: https://internet.byu.edu/research/trustbase
 # This needs to be updated when a release is actually made
-Source0: https://github.com/markoneill/%{name}/archive/%{name}-%{version}.tar.gz
+Source0: trustbase-linux-1.0.0.tar.gz
 Distribution: Linux
 
 BuildRequires: openssl-devel
@@ -29,10 +29,10 @@ BuildRequires: kernel-devel >= 4.5
 BuildRequires: kernel-headers >= 4.5
 
 %description
-LKM for TLS certificate validation.
+Plugins and Config for Trustbase.
 
 %prep
-%autosetup -n %{name}
+%autosetup -n %{kmod_package}
 git submodule init
 git submodule update
 
@@ -42,6 +42,8 @@ make
 
 %install
 make install
+# don't include the kernel module in this package
+rm build/trustbase_linux.ko
 mkdir -p %{buildroot}%{install_dir}
 cp -r build/* %{buildroot}%{install_dir}
 mkdir -p %{buildroot}%{_sysconfdir}/modules-load.d/
@@ -49,22 +51,21 @@ echo %{install_dir}/%{kmod_name}.ko tb_path="%{install_dir}"> %{buildroot}%{_sys
 
 %post
 ln -sf %{install_dir}/policy-engine/%{trustbase_config} %{_sysconfdir}/%{trustbase_config}
-# Create directory in which to store the kernel module
-# insmod does not detect symlinked files
-# insmod won't load the module if it is not in /lib/modules/%(uname -r)/
-mkdir -p %{module_dir}
-cp %{install_dir}/%{kmod_name}.ko %{module_dir}/%{kmod_name}.ko
-insmod %{module_dir}/%{kmod_name}.ko tb_path="%{install_dir}"
 
 %postun
-rmmod %{module_dir}/%{kmod_name}.ko
-rm %{module_dir}/%{kmod_name}.ko
-rmdir %{module_dir}
 rm -f %{_sysconfdir}/%{trustbase_config}
 
 %files
-%defattr(644,root,root,755)
-%{install_dir}/
+%{install_dir}/certs/ca.crt
+%{install_dir}/certs/ca.key
+%{install_dir}/Module.symvers
+%{install_dir}/modules.order
+%{install_dir}/policy_engine
+%{install_dir}/policy-engine/plugin-config/
+%{install_dir}/policy-engine/addons/python_plugins.so
+%{install_dir}/policy-engine/plugins/
+%{install_dir}/sslsplit/sslsplit
+%{install_dir}/policy-engine/%{trustbase_config}
 %{_sysconfdir}/modules-load.d/%{name}.conf
 
 %changelog
