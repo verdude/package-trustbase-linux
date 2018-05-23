@@ -47,7 +47,7 @@ rm build/trustbase_linux.ko
 mkdir -p %{buildroot}%{install_dir}
 cp -r build/* %{buildroot}%{install_dir}
 mkdir -p %{buildroot}%{_sysconfdir}/modules-load.d/
-echo %{install_dir}/%{kmod_name}.ko tb_path="%{install_dir}"> %{buildroot}%{_sysconfdir}/modules-load.d/%{name}.conf
+echo %{kmod_name} tb_path="%{install_dir}"> %{buildroot}%{_sysconfdir}/modules-load.d/%{name}.conf
 
 %post
 ln -sf %{install_dir}/policy-engine/%{trustbase_config} %{_sysconfdir}/%{trustbase_config}
