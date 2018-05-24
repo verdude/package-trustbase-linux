@@ -44,6 +44,7 @@ Requires: libevent-devel
 Requires: pyOpenSSL
 Requires: kernel-devel >= 4.5
 Requires: kernel-headers >= 4.5
+Requires: dkms >= 1
 
 %description
 This package contains the Trustbase module wrapped
