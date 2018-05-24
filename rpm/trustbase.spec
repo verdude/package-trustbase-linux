@@ -58,7 +58,6 @@ git submodule update
 # change the install directory prefix from /usr/lib/trustbase-linux to %{local_install_dir}
 sed -i 's/^PREFIX = \S*$/PREFIX = %{local_install_dir}/g' Makefile
 cp ../dkms.conf .
-cp ../post_dkms_build.sh .
 
 %build
 make -C sslsplit
@@ -86,7 +85,6 @@ for files in loader.{h,c} \
     cp --parents $files %{buildroot}%{dkms_src_dir}
 done
 cp dkms.conf %{buildroot}%{dkms_src_dir}
-cp post_dkms_build.sh %{buildroot}%{dkms_src_dir}
 
 %post
 dkms add -m %{name} -v %{version} --rpm_safe_upgrade
@@ -109,14 +107,12 @@ exit 0
 
 %preun
 modprobe -r %{module}
+# remove config symlink
+rm -f %{_sysconfdir}/%{trustbase_config}
 echo -e
 echo -e "Uninstall of %{name} module (version %{version}) beginning:"
 dkms remove -m %{name} -v %{version} --all --rpm_safe_upgrade
 exit 0
-
-%postun
-# remove config symlink
-rm -f %{_sysconfdir}/%{trustbase_config}
 
 %files
 %defattr(-,root,root)
@@ -133,6 +129,6 @@ rm -f %{_sysconfdir}/%{trustbase_config}
 %{startup_options}
 
 %changelog
-* Wed May 23 2018 Santiago Verdu santiagoverdu@protonmail.com 1.0.0-1
+* Wed May 23 2018 Santiago Verdu santiagoverdu01@gmail.com 1.0.0-1
 - Initial RPM release
 
