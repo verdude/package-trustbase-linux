@@ -5,9 +5,10 @@
 %define install_dir       %{_libdir}/%{name}
 %define local_install_dir build
 %define dkms_src_dir      %{_usrsrc}/%{name}-%{version}
-%define debug_package     %{nil}
 %define startup_options   %{_sysconfdir}/modprobe.d/%{name}.conf
 %define startup_conf      %{_sysconfdir}/modules-load.d/%{name}.conf
+%define debug_package     %{nil}
+%define _unpackaged_files_terminate_build 0
 
 Name: %{name}
 Version: %{version}
@@ -117,12 +118,24 @@ exit 0
 %files
 %defattr(-,root,root)
 %{dkms_src_dir}/
+%dir %{install_dir}
+%dir %{install_dir}/certs
+%dir %{install_dir}/policy-engine/plugins/whitelist_plugin
+%dir %{install_dir}/sslsplit
+%dir %{install_dir}/policy-engine/plugins
+%dir %{install_dir}/policy-engine/plugins/cert_pinning
+%dir %{install_dir}/policy-engine/plugin-config
+%dir %{install_dir}/policy-engine
+%dir %{install_dir}/policy-engine/addons
 %{install_dir}/certs/ca.crt
 %{install_dir}/certs/ca.key
 %{install_dir}/policy_engine
-%{install_dir}/policy-engine/plugin-config/
+%{install_dir}/policy-engine/plugin-config/cipher_suite.cfg
 %{install_dir}/policy-engine/addons/python_plugins.so
-%{install_dir}/policy-engine/plugins/
+%{install_dir}/policy-engine/plugins/*.py
+%{install_dir}/policy-engine/plugins/*.so
+%{install_dir}/policy-engine/plugins/cert_pinning/*.so
+%{install_dir}/policy-engine/plugins/whitelist_plugin/*.so
 %{install_dir}/sslsplit/sslsplit
 %{install_dir}/policy-engine/%{trustbase_config}
 %{startup_conf}
