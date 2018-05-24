@@ -1,9 +1,8 @@
 #!/bin/bash
 
-set -e
 VERSION=1.0.0
 NAME=trustbase-linux
-OWNER=markoneill
+OWNER=verdude
 
 scriptpath="$(cd "$(dirname "$0")"; pwd -P)"
 cd "$scriptpath"
@@ -28,19 +27,23 @@ if [ -z "$(id $USER | grep mock)" ]; then
     fi
 fi
 
+rm -rf x86_64
+rm -f *.rpm
 git clone https://github.com/$OWNER/$NAME
 # change the build target to a local directory
-sed -i.bak 's/^PREFIX = \S*$/PREFIX = build/g' $NAME/Makefile
 mv $NAME $NAME-$VERSION
-cp dkms.conf $NAME-$VERSION
 tar cf $NAME-$VERSION.tar.gz $NAME-$VERSION
 sudo rm -rf $NAME-$VERSION
 
 sudo fedpkg --release f27 local
+exit_code=$?
 
 rm $NAME-$VERSION.tar.gz
 sudo rm -rf $NAME-$VERSION
 
-if [ -d noarch ]; then
-    sudo chown -R $USER:$USER noarch
+if [ -d x86_64 ]; then
+    sudo chown -R $USER:$USER x86_64
 fi
+
+exit $exit_code
+
