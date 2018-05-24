@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./build.sh
+sudo dnf remove trustbase-linux -y
+sudo dnf install x86_64/trustbase-linux-1.0.0-1.x86_64.rpm -y

@@ -27,10 +27,9 @@ if [ -z "$(id $USER | grep mock)" ]; then
     fi
 fi
 
-rm -rf x86_64
+rm -rf x86_64/$NAME-$VERSION*.rpm
 rm -f *.rpm
 git clone https://github.com/$OWNER/$NAME
-# change the build target to a local directory
 mv $NAME $NAME-$VERSION
 tar cf $NAME-$VERSION.tar.gz $NAME-$VERSION
 sudo rm -rf $NAME-$VERSION
