@@ -1,0 +1,12 @@
+Source: trustbase-linux
+Section: admin
+Priority: optional
+Maintainer: Santiago Verdu <santiagoverdu01@gmail.com>
+
+Package: trustbase-linux
+Architecture: amd64
+Depends: ${shlibs:Depends}, linux-headers-$(uname -r), dkms, pkg-config, libssl-dev, libevent-dev, libconfig-dev, libsqlite3-dev, libcap-dev, libnl-genl-3-dev, python2.7-dev
+Description: Trustbase Kernel Module and addons
+ This package contains the Trustbase module wrapped
+ for the DKMS framework.
+ As well as plugins and configuration for Trustbase.

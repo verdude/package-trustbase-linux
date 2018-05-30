@@ -1,0 +1,5 @@
+trustbase-linux (0.1.0-1) experimental; urgency=low
+
+  - Initial RPM release
+
+ -- Santiago Verdu <santiagoverdu01@gmail.com>  Wed, 30 May 2018 13:00:49 -0700

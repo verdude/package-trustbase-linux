@@ -1,0 +1,18 @@
+#!/bin/bash
+dkms add -m trustbase-linux -v 1.0.0 --rpm_safe_upgrade
+
+if [ `uname -r | grep -c "BOOT"` -eq 0 ] && [ -e /lib/modules/`uname -r`/build/include ]; then
+    dkms build -m trustbase-linux -v 1.0.0
+    dkms install -m trustbase-linux -v 1.0.0
+elif [ `uname -r | grep -c "BOOT"` -gt 0 ]; then
+    echo -e ""
+    echo -e "Module build for the currently running kernel was skipped since you"
+    echo -e "are running a BOOT variant of the kernel."
+else
+    echo -e ""
+    echo -e "Module build for the currently running kernel was skipped since the"
+    echo -e "kernel headers for this kernel do not seem to be installed."
+fi
+ln -sf /usr/lib/trustbase-linux/policy-engine/trustbase.cfg /etc/trustbase.cfg
+modprobe trustbase_linux tb_path="/usr/lib/trustbase-linux"
+exit 0

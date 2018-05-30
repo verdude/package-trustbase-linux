@@ -1,0 +1,8 @@
+#!/bin/bash
+modprobe -r trustbase_linux
+# remove config symlink
+rm -f /etc/trustbase.cfg
+echo -e
+echo -e "Uninstall of trustbase-linux module (version 1.0.0) beginning:"
+dkms remove -m trustbase-linux -v 1.0.0 --all --rpm_safe_upgrade
+exit 0
