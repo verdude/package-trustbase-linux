@@ -1,4 +1,4 @@
-%define version           1.0.0
+%define version           0.1.0
 %define name              trustbase-linux
 %define module            trustbase_linux
 %define trustbase_config  trustbase.cfg
@@ -15,15 +15,13 @@ Version: %{version}
 Release: 1
 License: Public Domain
 Group: Security
+BuildArch: x86_64
 Summary: Trustbase Kernel Module and addons
 URL: https://internet.byu.edu/research/trustbase
 # This needs to be updated when a release is actually made
-Source0: %{name}-%{version}.tar.gz
+Source0: http://santi.space/trustbase/source/%{name}-%{version}.tar.gz
 Distribution: Linux
 
-# These build tools are required because
-# the kernel module is built although it is not packaged
-BuildRequires: git
 BuildRequires: openssl-devel
 BuildRequires: libconfig-devel
 BuildRequires: libnl3-devel
@@ -54,11 +52,6 @@ As well as plugins and configuration for Trustbase.
 
 %prep
 %autosetup
-git submodule init
-git submodule update
-# change the install directory prefix from /usr/lib/trustbase-linux to %{local_install_dir}
-sed -i 's/^PREFIX = \S*$/PREFIX = %{local_install_dir}/g' Makefile
-cp ../dkms.conf .
 
 %build
 make -C sslsplit

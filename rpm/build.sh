@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.0.0
+VERSION=0.1.0
 NAME=trustbase-linux
 OWNER=verdude
 
@@ -8,7 +8,7 @@ scriptpath="$(cd "$(dirname "$0")"; pwd -P)"
 cd "$scriptpath"
 
 if [ -n "$(which dnf)" ]; then
-    sudo dnf install -y fedora-packager fedora-review git gcc
+    sudo dnf install -y fedora-packager fedora-review git gcc openssl-devel libconfig-devel libnl3-devel libsqlite3x-devel libcap-devel python-devel kernel-devel-$(uname -r) kernel-headers-$(uname -r) libevent-devel pyOpenSSL
 else
     echo "This script is meant to be run on Fedora."
     exit 1
@@ -27,12 +27,9 @@ if [ -z "$(id $USER | grep mock)" ]; then
     fi
 fi
 
-rm -rf x86_64/$NAME-$VERSION*.rpm
+rm -rf x86_64
 rm -f *.rpm
-git clone https://github.com/$OWNER/$NAME
-mv $NAME $NAME-$VERSION
-tar cf $NAME-$VERSION.tar.gz $NAME-$VERSION
-sudo rm -rf $NAME-$VERSION
+./dl.sh $OWNER $NAME $VERSION
 
 sudo fedpkg --release f27 local
 exit_code=$?
