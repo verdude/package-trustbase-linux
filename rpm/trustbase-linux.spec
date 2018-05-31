@@ -33,6 +33,8 @@ BuildRequires: pyOpenSSL
 
 # The kernel module is built on the end user's
 # system and so the build tools are required for them as well
+Requires: kernel-headers
+Requires: kernel-devel
 Requires: dkms >= 1
 
 %description
@@ -55,6 +57,7 @@ mkdir -p %(dirname %{buildroot}%{startup_conf})
 mkdir -p %(dirname %{buildroot}%{startup_options})
 echo "%{module}" > %{buildroot}%{startup_conf}
 echo "options %{module} tb_path=%{install_dir}" > %{buildroot}%{startup_options}
+ln -sf %{install_dir}/policy-engine/%{trustbase_config} %{buildroot}%{_sysconfdir}/%{trustbase_config}
 # place the trustbase kernel module code tree in the dkms_src_dir directory for dkms
 mkdir -p %{buildroot}%{dkms_src_dir}
 for files in loader.{h,c} \
@@ -92,7 +95,6 @@ else
     echo -e "packages and then reboot in order for dkms to autobuild the trustbase_linux kernel module."
     echo -e ""
 fi
-ln -sf %{install_dir}/policy-engine/%{trustbase_config} %{_sysconfdir}/%{trustbase_config}
 if [ -n "$installed" ]; then
     modprobe %{module} tb_path="%{_libdir}/%{name}"
 fi
@@ -100,8 +102,6 @@ exit 0
 
 %preun
 modprobe -r %{module}
-# remove config symlink
-rm -f %{_sysconfdir}/%{trustbase_config}
 echo -e
 echo -e "Uninstall of %{name} module (version %{version}) beginning:"
 dkms remove -m %{name} -v %{version} --all --rpm_safe_upgrade
@@ -130,6 +130,7 @@ exit 0
 %{install_dir}/policy-engine/plugins/whitelist_plugin/*.so
 %{install_dir}/sslsplit/sslsplit
 %{install_dir}/policy-engine/%{trustbase_config}
+%{_sysconfdir}/%{trustbase_config}
 %config(noreplace) %{startup_conf}
 %config(noreplace) %{startup_options}
 
