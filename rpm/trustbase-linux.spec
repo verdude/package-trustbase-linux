@@ -14,8 +14,8 @@ Name: %{name}
 Version: %{version}
 Release: 1
 License: Public Domain
-Group: Security
-BuildArch: x86_64
+Group: devel
+ExclusiveArch: x86_64
 Summary: Trustbase Kernel Module and addons
 URL: https://internet.byu.edu/research/trustbase
 # This needs to be updated when a release is actually made
@@ -33,16 +33,6 @@ BuildRequires: pyOpenSSL
 
 # The kernel module is built on the end user's
 # system and so the build tools are required for them as well
-Requires: openssl-devel
-Requires: libconfig-devel
-Requires: libnl3-devel
-Requires: libsqlite3x-devel
-Requires: libcap-devel
-Requires: python-devel
-Requires: libevent-devel
-Requires: pyOpenSSL
-Requires: kernel-devel >= 4.5
-Requires: kernel-headers >= 4.5
 Requires: dkms >= 1
 
 %description
@@ -65,7 +55,7 @@ mkdir -p %(dirname %{buildroot}%{startup_conf})
 mkdir -p %(dirname %{buildroot}%{startup_options})
 echo "%{module}" > %{buildroot}%{startup_conf}
 echo "options %{module} tb_path=%{install_dir}" > %{buildroot}%{startup_options}
-# place the trustbase kernel module code tree in the %{dkms_src_dir} directory for dkms
+# place the trustbase kernel module code tree in the dkms_src_dir directory for dkms
 mkdir -p %{buildroot}%{dkms_src_dir}
 for files in loader.{h,c} \
         interceptor/interceptor.{h,c} \
@@ -83,9 +73,13 @@ cp dkms.conf %{buildroot}%{dkms_src_dir}
 %post
 dkms add -m %{name} -v %{version} --rpm_safe_upgrade
 
+installed=""
 if [ `uname -r | grep -c "BOOT"` -eq 0 ] && [ -e /lib/modules/`uname -r`/build/include ]; then
     dkms build -m %{name} -v %{version}
     dkms install -m %{name} -v %{version}
+    if [ $? -eq 0 ]; then
+        installed="true"
+    fi
 elif [ `uname -r | grep -c "BOOT"` -gt 0 ]; then
     echo -e ""
     echo -e "Module build for the currently running kernel was skipped since you"
@@ -94,9 +88,14 @@ else
     echo -e ""
     echo -e "Module build for the currently running kernel was skipped since the"
     echo -e "kernel headers for this kernel do not seem to be installed."
+    echo -e "You will have to install the kernel-devel-$(uname -r) and kernel-headers-$(uname -r)"
+    echo -e "packages and then reboot in order for dkms to autobuild the trustbase_linux kernel module."
+    echo -e ""
 fi
 ln -sf %{install_dir}/policy-engine/%{trustbase_config} %{_sysconfdir}/%{trustbase_config}
-modprobe %{module} tb_path="%{_libdir}/%{name}"
+if [ -n "$installed" ]; then
+    modprobe %{module} tb_path="%{_libdir}/%{name}"
+fi
 exit 0
 
 %preun
@@ -131,10 +130,10 @@ exit 0
 %{install_dir}/policy-engine/plugins/whitelist_plugin/*.so
 %{install_dir}/sslsplit/sslsplit
 %{install_dir}/policy-engine/%{trustbase_config}
-%{startup_conf}
-%{startup_options}
+%config(noreplace) %{startup_conf}
+%config(noreplace) %{startup_options}
 
 %changelog
-* Wed May 23 2018 Santiago Verdu santiagoverdu01@gmail.com 1.0.0-1
+* Wed May 23 2018 Santiago Verdu santiagoverdu01@gmail.com 0.1.0-1
 - Initial RPM release
 

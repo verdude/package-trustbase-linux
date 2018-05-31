@@ -18,6 +18,7 @@ cd ..
 cp dkms.conf $NAME-$VERSION
 # change the install directory prefix from /usr/lib/trustbase-linux to $LOCAL_INSTALL_DIR
 sed -i "s/^PREFIX = \S*$/PREFIX = $LOCAL_INSTALL_DIR/g" $NAME-$VERSION/Makefile
+chmod 775 $NAME-$VERSION/policy-engine/plugins/*.py
 
 tar cf $NAME-$VERSION.tar.gz $NAME-$VERSION
 sudo rm -rf $NAME-$VERSION
