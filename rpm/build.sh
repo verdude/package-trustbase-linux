@@ -9,7 +9,7 @@ scriptpath="$(cd "$(dirname "$0")"; pwd -P)"
 cd "$scriptpath"
 
 if [ -n "$(which dnf)" ]; then
-    sudo dnf install -y fedora-packager fedora-review git gcc openssl-devel libconfig-devel libnl3-devel libsqlite3x-devel libcap-devel python-devel libevent-devel pyOpenSSL
+    sudo dnf install -y fedora-packager fedora-review git gcc openssl-devel libconfig-devel libnl3-devel libsqlite3x-devel libcap-devel python-devel libevent-devel pyOpenSSL make
 else
     echo "This script is meant to be run on Fedora."
     exit 1
